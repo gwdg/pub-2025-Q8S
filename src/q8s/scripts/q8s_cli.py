@@ -110,9 +110,9 @@ def deploy(openstack_conf_file: Path, cluster_data_file: Path, dry_run: bool) ->
         logger.debug(f"Starting init_host_setup for workers with servers: {worker_nodes}")
         processes = []
         for ip in worker_nodes.values():
-            processes.append(multiprocessing.Process(target=initialize_setups.init_host_setup, args=[ip,]))
+            processes.append(multiprocessing.Process(target=initialize_setups.init_host_setup, args=[cluster_data.git_url,ip,]))
         for ip in master_nodes.values():
-            processes.append(multiprocessing.Process(target=initialize_setups.init_master_setup, args=[ip,]))
+            processes.append(multiprocessing.Process(target=initialize_setups.init_master_setup, args=[cluster_data.git_url, ip,]))
         for p in processes:
             p.start()
         logger.info("Setups started. Waiting for callbacks... this might take some time (15+ min)")
