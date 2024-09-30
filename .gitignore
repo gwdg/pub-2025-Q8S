@@ -1,0 +1,6 @@
+*.iso
+__pycache__/
+.venv/
+logs/
+testing/
+test*

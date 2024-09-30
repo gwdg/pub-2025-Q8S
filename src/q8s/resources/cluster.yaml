@@ -1,0 +1,75 @@
+!ClusterData
+# working URL for "git clone"
+git_url: "https://github.com/vhasse/Q8S.git"
+# network ID of the OpenStack network to be used for the cluster
+openstack_network_id: ""
+# IP range of the network in CIDR notation. currently /24 network expected
+remote_ip_prefix: "10.254.1.0/24"
+# name of the OpenStack image to use for the instances
+default_image_name: "Ubuntu 22.04.4 Server x86_64 (ssd)"
+# name of the instance (in OpenStack) on which Q8S is started
+name_of_initial_instance: "q8s-master"
+# security groups that should be added to the OS instances. Required: "q8s-cluster" (should not already exist)
+security_groups:
+- "q8s-cluster"
+# TCP ports that should be added to the "q8s-cluster" security group
+required_tcp_ports: 
+- 22
+- 80
+- 443
+- 2222
+- 2379
+- 2380
+- 6443
+- 8472
+- 10250
+- 10256
+- 10257
+- 10259
+# UDP ports that should be added to the "q8s-cluster" security group
+required_udp_ports:
+- 8472
+# TCP and UDP port range that should be added to the "q8s-cluster" security group
+worker_port_range_min: 30000
+worker_port_range_max: 32767
+# here you can define the composition of the emulated cluster
+cluster_definition: !ClusterDefinition
+  # OpenStack flavor for additional master-nodes
+  master_node_flavor: "c1.small"
+  number_additional_master_nodes: 1
+  # number of nodes of the specific types defined below
+  worker: 
+    x86-small: 1
+    arm-mid: 1
+# here you can configure the individual node-types
+vm_types: !VmTypes
+
+  types:
+    # name of the type. Names of VmTypes can only contain characters that are allowed in hostnames (e.g., use "-" instead of "_")!
+    x86-small: !VmType
+      # architecture of the node. Currently only "x86_64" and "arm_64" are supported
+      architecture: "x86_64"
+      # number of vcpus 
+      num_cpus: 2
+      # name of the CPU model as listed in QEMU documentation. Has to match the architecture! No automated checking!
+      cpu_model: "EPYC-Rome"
+      # name of the machine model. Use "virt" as default. For more information check https://qemu-project.gitlab.io/qemu/system/targets.html#
+      machine_model: "virt"
+      # RAM in MB
+      ram: 2048
+      # storage in GB
+      storage: 10
+      # OpenStack flavor to use for the host. Make sure it is has enough compute power to support the VM-type
+      openstack_flavor: "c1.medium"
+      # not implemented yet. Placeholder for additional specifications
+      qemu_args: "qemu-args"
+    arm-mid: !VmType
+      architecture: "arm_64"
+      num_cpus: 6
+      cpu_model: "cortex-a57"
+      machine_model: "virt"
+      ram: 4096
+      storage: 20
+      openstack_flavor: "c1.large"
+      qemu-args: ""
+
