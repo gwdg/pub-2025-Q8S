@@ -31,7 +31,8 @@ def init_host_setup(giturl: str, ip: str):
     """
     PATH_TO_HOST_SETUP_SCRIPT = "~/Q8S/src/q8s/scripts/setup_host.sh"
     # export  GNUTLS_CPUID_OVERRIDE=0x1 to make git clone work; see https://askubuntu.com/questions/1420966/method-https-has-died-unexpectedly-sub-process-https-received-signal-4-after
-    COMMAND = f"echo 'wait for cloud-init'; cloud-init status --wait  > /dev/null 2>&1; export  GNUTLS_CPUID_OVERRIDE=0x1; cd ~; sudo apt update; sudo apt install -y git; echo 'cloning git repo'; git clone {giturl}; cd mastersthesis/Q8S; sudo apt install -y python3-pip; pip install .; bash {PATH_TO_HOST_SETUP_SCRIPT} > /home/cloud/setup.log"
+    COMMAND = f"echo 'wait for cloud-init'; cloud-init status --wait  > /dev/null 2>&1; export  GNUTLS_CPUID_OVERRIDE=0x1; cd ~; sudo apt update; sudo apt install -y git; echo 'cloning git repo'; git clone {giturl}; cd ~/Q8S; sudo apt install -y python3-pip; pip install .; bash {PATH_TO_HOST_SETUP_SCRIPT} > /home/cloud/setup.log"
+
     reachable = helper_functions.check_if_ip_is_reachable(ip)
     if not(reachable):
         print(f"Host with ip: {ip} not reachable for initialization. Aborting cluster creation.")
