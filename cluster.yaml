@@ -61,8 +61,6 @@ vm_types: !VmTypes
       storage: 10
       # OpenStack flavor to use for the host. Make sure it is has enough compute power to support the VM-type
       openstack_flavor: "c1.medium"
-      # not implemented yet. Placeholder for additional specifications
-      qemu_args: "qemu-args"
     arm-mid: !VmType
       architecture: "arm_64"
       num_cpus: 6

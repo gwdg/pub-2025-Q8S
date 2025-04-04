@@ -30,7 +30,6 @@ class VmType(yaml.YAMLObject):
     ram: int = 2048
     storage: int = 10
     openstack_flavor: str = "c1.medium"
-    qemu_args: str = "qemu-args"
     yaml_tag = "!VmType"
     yaml_loader = yaml.SafeLoader
 
