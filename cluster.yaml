@@ -1,8 +1,8 @@
 !ClusterData
 # working URL for "git clone"
-git_url: "https://github.com/vhasse/Q8S.git"
+git_url: "https://github.com/gwdg/pub-2025-q8s.git"
 # network ID of the OpenStack network to be used for the cluster
-openstack_network_id: ""
+private_network_id: ""
 # IP range of the network in CIDR notation. currently /24 network expected
 remote_ip_prefix: "10.254.1.0/24"
 # name of the OpenStack image to use for the instances

@@ -2,7 +2,7 @@
 name = "q8s"
 version = "0.1.0"
 description = "Emulated Kubernetes Cluster"
-authors = ["Vincent Hasse <v.hasse@stud.uni-goettingen.de>"]
+authors = ["Vincent Hasse <v.hasse@stud.uni-goettingen.de>", "Jonathan Decker <jonathan.decker@uni-goettingen.de>"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "q8s", from = "src"}]

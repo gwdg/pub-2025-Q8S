@@ -1,93 +1,77 @@
 # Q8S
-TODO
 
+This repository contains the source code for the Q8S prototype implementation.
+It uses [QEMU](https://qemu.org/) and [libvirt](https://libvirt.org/) to create emulated Kubernetes nodes in an OpenStack environment
+to emulate heterogeneous Kubernetes clusters for the purpose of research and development of scheduling solutions for heterogeneous clusters.
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.gwdg.de/v.hasse/mastersthesis.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.gwdg.de/v.hasse/mastersthesis/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Given a cluster specification and OpenStack application credentials, Q8S will
+- request nodes from OpenStack
+- initialize a Kubernetes cluster on the first node
+- install Kubernetes on the other control plane nodes
+- prepare QEMU on the worker nodes to emulate the desired hardware
+- let the worker nodes running on emulated hardware join the cluster
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+
+Q8S is to be used in an OpenStack environment, please make sure that sufficient resources are available in your
+OpenStack project for the cluster that you want to create.
+Q8S expects to be installed on one of the OpenStack nodes, which will be used as the first control plane node.
+
+To install Q8S, please complete the following steps:
+- Deploy an OpenStack VM running Ubuntu (22.04 or newer recommended) and name it `q8s-master`
+- Connect to the VM per SSH
+- Install git and python3-poetry `sudo apt update && sudo apt install -y git python3-poetry`
+- Clone the Q8S repository `git clone https://github.com/gwdg/pub-2025-q8s.git`
+- Change into the Q8S directory `cd pub-2025-q8s`
+- `poetry config virtualenvs.in-project true`
+- `poetry install`
+- `source .venv/bin/activate`
+- Open the OpenStack Horizon web interface and navigate to Identity and Application Credentials, create a new credential and download them as `clouds.yaml`
+- Copy the `clouds.yaml` file to the Q8S directory
+- In the OpenStack Horizon web interface navigate to Networks and Network and find the private network, open it and copy its ID
+- Edit the `cluster.yaml` file, set the `private_network_id` to the ID of the private network
+
+After completing these steps you are ready to use Q8S to deploy a cluster by configuring the `cluster.yaml` file
+and running `q8s deploy clouds.yaml cluster.yaml`.
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+Configure `cluster.yaml` according to your needs and run `q8s deploy clouds.yaml cluster.yaml` to start the deployment.
+Upon completion, the specified heterogeneous Kubernetes cluster will be ready for usage via kubectl as Q8S automatically sets up the kubeconfig file.
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+See the following table for configuring the `cluster.yaml` file:
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+| Parameter                      | Description                                                                                                  |
+|--------------------------------|--------------------------------------------------------------------------------------------------------------|
+| git_url                        | URL to a Q8S repository for downloading scripts on the deployed nodes                                        |
+| private_network_id             | ID of the private OpenStack network used in the OpenStack project                                            |
+| remote_ip_prefix               | IP range of the OpenStack network in CIDR notation, /24 network expected                                     |
+| default_image_name             | Name of the OpenStack image to use for the host instances, should be an Ubuntu image                         |
+| name_of_initial_instance       | Name of the instance (in OpenStack) on which Q8S is started, default is "q8s-master"                         |
+| security_groups                | Security groups that should be added to the OS instances. Required: "q8s-cluster" (should not already exist) |
+| required_tcp_ports             | TCP ports that should be added to the "q8s-cluster" security group, defaults should be kept                  |
+| required_udp_ports             | UDP ports that should be added to the "q8s-cluster" security group, defaults should be kept                  |
+| worker_port_range_min          | Minimum port number for the worker port range, will be opened via security group and used for K8s worker     |
+| worker_port_range_max          | Maximum port number for the worker port range, will be opened via security group and used for K8s worker     |
+| master_node_flavor             | Name of the OpenStack flavor to use for the master node                                                      |
+| number_additional_master_nodes | Number of additional master nodes to deploy, these nodes will deploy without QEMU                            |
+| worker                         | Specify vm_types and set the number to deploy for each here                                                  |
+| vm_types                       | Fill out the dictionary to specify a new worker node type                                                    |
+| architecture                   | System architecture of the nodes, currently only "x86_64" and "arm_64" are supported                         |
+| num_cpus                       | Number of VCPUs                                                                                              |
+| cpu_model                      | Name of the CPU model as listed in QEMU documentation. Has to match the architecture!                        |
+| machine_model                  | Name of the machine model. Should always be "virt"                                                           |
+| ram                            | RAM in MB                                                                                                    |
+| storage                        | Storage in GB                                                                                                |
+| openstack_flavor               | OpenStack flavor to use for the host. Must have enough compute power to support the VM-type                  |
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## How it works
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Q8S deploy QEMU on top of the OpenStack VMs it requests for a given cluster configuration.
+It then uses Ubuntu Cloud-Images for the requested architecture to prepare VM images for QEMU and deploys them.
+Via cloud-init scripts, Kubernetes is installed and configured within the QEMU VMs.
+To join all the nodes together, Q8S configures iptables such that any traffic sent 
+to the OpenStack VM is redirected to the internal QEMU VM using NAT rules.
+The exceptions to this are port 22, which still provides SSH access to the OpenStack host and port 2222, which redirects
+to port 22 of the QEMU VM for SSH access.
